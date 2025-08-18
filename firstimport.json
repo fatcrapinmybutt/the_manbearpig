@@ -1,0 +1,26 @@
+{
+    "system": "FRED PRIME Litigation Deployment Engine",
+    "base_path": "F:/GitRepo/fredprime",
+    "output_path": "F:/GitRepo/fredprime/output",
+    "log_path": "F:/GitRepo/fredprime/logs",
+    "config": {
+        "exhibit_labeling": true,
+        "motion_linking": true,
+        "signature_validation": true,
+        "judicial_audit": true,
+        "parenting_time_matrix": true,
+        "conspiracy_tracker": true
+    },
+    "modules": {
+        "exhibit_labeler": "Renames evidence files A–Z and builds Exhibit_Index.md",
+        "motion_exhibit_linker": "Scans motions, finds exhibit references, builds Motion_to_Exhibit_Map.md",
+        "signature_validator": "Checks for MCR 1.109(D)(3) compliance",
+        "judicial_conduct_tracker": "Builds Exhibit U with judge behavior patterns",
+        "appclose_matrix": "Parses AppClose logs to generate Exhibit Y (violations matrix)",
+        "conspiracy_log": "Parses police reports and logs false allegations into Exhibit S"
+    },
+    "execution_command": "powershell -ExecutionPolicy Bypass -File fred_deploy.ps1",
+    "offline_capable": true,
+    "token_usage": "Zero (local execution only)",
+    "dependencies": ["PowerShell 5+", "Git", "Windows OS"]
+}
