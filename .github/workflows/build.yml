@@ -1,0 +1,92 @@
+name: Codex Build
+
+on:
+  push:
+    branches: ["main", "codex/**"]
+  pull_request:
+    branches: ["main", "codex/**"]
+
+jobs:
+  codex-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Detect Changed Files
+        id: changes
+        run: |
+          git fetch --depth=2 origin main || true
+          before=${{ github.event.before }}
+          after=${{ github.sha }}
+
+          # Fallback for initial push
+          if [ -z "$before" ]; then before=$(git rev-parse HEAD^1); fi
+
+          diff=$(git diff --name-only $before $after || echo '')
+          echo "$diff" > changed_files.txt
+
+          # Default false
+          echo "run_tests=false" >> "$GITHUB_OUTPUT"
+
+          # Trigger if file types match
+          while read -r f; do
+            if [[ "$f" =~ \.py$|\.ts$|\.js$|\.json$ ]]; then
+              echo "run_tests=true" >> "$GITHUB_OUTPUT"
+              break
+            fi
+          done <<< "$diff"
+
+          # Trigger if branch includes keywords
+          branch_name="${GITHUB_REF##*/}"
+          for key in core engine matrix patch hotfix; do
+            if [[ "$branch_name" == *"$key"* ]]; then
+              echo "run_tests=true" >> "$GITHUB_OUTPUT"
+              break
+            fi
+          done
+
+      - name: Install Python Dependencies
+        if: steps.changes.outputs.run_tests == 'true'
+        run: |
+          pip install -r requirements.txt
+          pip install black flake8 mypy pytest safety
+
+      - name: Lint Code
+        if: steps.changes.outputs.run_tests == 'true'
+        run: |
+          black --check . || exit 1
+          mypy --strict || exit 1
+          flake8 || exit 1
+
+      - name: Security Audit (Safety)
+        if: steps.changes.outputs.run_tests == 'true'
+        run: |
+          safety check --full-report || true
+
+      - name: Update Codex Manifest
+        if: steps.changes.outputs.run_tests == 'true'
+        run: python codex_brain.py
+
+      - name: Run Selftests (codex_selftest.py)
+        if: steps.changes.outputs.run_tests == 'true' && exists('codex_selftest.py')
+        continue-on-error: true
+        run: python codex_selftest.py
+
+      - name: Run Integration Tests (if present)
+        if: steps.changes.outputs.run_tests == 'true' && exists('integration_tests')
+        continue-on-error: false
+        run: pytest integration_tests || exit 1
+
+      - name: Run Global Tests
+        if: steps.changes.outputs.run_tests == 'true'
+        run: pytest || exit 1
