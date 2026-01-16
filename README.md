@@ -70,7 +70,20 @@ The **Convergence Cycle Engine** provides litigation-grade iterative builds with
 ### **Running the Convergence Cycle**
 
 ```bash
+# Run full convergence cycle
 python convergence_cycle_engine.py
+
+# Or use the CLI wrapper
+python run_cycle.py
+
+# Check current status
+python run_cycle.py --status
+
+# View version history
+python run_cycle.py --history
+
+# Create snapshot without full cycle
+python run_cycle.py --snapshot
 ```
 
 ### **Version Management**

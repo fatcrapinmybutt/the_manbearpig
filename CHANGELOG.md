@@ -8,6 +8,36 @@ and this project adheres to litigation-grade versioning with immutable snapshots
 
 
 
+
+
+## [v0006] - 2026-01-16
+
+### Added
+- N/A
+
+### Changed
+- N/A
+
+### Fixed
+- Updated tests in test_file_1.py
+- Updated tests in test_file_2.py
+- Updated tests in test_file_3.py
+
+
+## [v0005] - 2026-01-16
+
+### Added
+- N/A
+
+### Changed
+- N/A
+
+### Fixed
+- Updated tests in test_file_1.py
+- Updated tests in test_file_2.py
+- Updated tests in test_file_3.py
+
+
 ## [v0004] - 2026-01-16
 
 ### Added

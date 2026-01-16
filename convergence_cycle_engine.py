@@ -257,7 +257,7 @@ class ConvergenceCycleEngine:
 
     def update_manifest(self) -> None:
         """Update codex_manifest.json with current module hashes."""
-        manifest = []
+        manifest_list = []
         
         for py_file in Path(".").rglob("*.py"):
             # Skip test files and excluded directories
@@ -278,16 +278,17 @@ class ConvergenceCycleEngine:
             except Exception:
                 pass
             
-            manifest.append({
+            manifest_list.append({
                 "module": py_file.stem,
                 "path": str(py_file),
                 "hash": sha256,
+                "sha256": sha256,  # Add this for compatibility with verify_all_modules
                 "legal_function": legal_function,
                 "dependencies": []
             })
         
-        self.module_count = len(manifest)
-        MANIFEST_FILE.write_text(json.dumps(manifest, indent=2))
+        self.module_count = len(manifest_list)
+        MANIFEST_FILE.write_text(json.dumps(manifest_list, indent=2))
         logger.info(f"Updated MANIFEST with {self.module_count} modules")
 
     def run_smoke_tests(self) -> bool:
@@ -515,6 +516,7 @@ class ConvergenceCycleEngine:
         manifest_path.write_text(json.dumps(build_manifest, indent=2))
         
         # Create ZIP archive
+        files_added = set()
         with zipfile.ZipFile(release_path, "w", zipfile.ZIP_DEFLATED) as zf:
             # Add all relevant files
             for pattern in ["*.py", "*.json", "*.yaml", "*.yml", "*.md", "*.txt"]:
@@ -528,17 +530,23 @@ class ConvergenceCycleEngine:
                         logger.warning(f"Skipping large file: {file}")
                         continue
                     
-                    # Add to archive
+                    # Avoid duplicates
                     arcname = str(file)
+                    if arcname in files_added:
+                        continue
+                    
+                    # Add to archive
                     zf.write(file, arcname=arcname)
+                    files_added.add(arcname)
             
             # Add manifest
             zf.write(manifest_path, arcname=f"build_manifest_{self.current_version}.json")
             
-            # Add CURRENT and VERSION
-            zf.write(VERSION_FILE, arcname="VERSION")
-            zf.write(CURRENT_FILE, arcname="CURRENT")
-            zf.write(CHANGELOG_FILE, arcname="CHANGELOG.md")
+            # Add CURRENT and VERSION (if not already added)
+            if "VERSION" not in files_added:
+                zf.write(VERSION_FILE, arcname="VERSION")
+            if "CURRENT" not in files_added:
+                zf.write(CURRENT_FILE, arcname="CURRENT")
         
         release_size = release_path.stat().st_size
         release_size_mb = release_size / (1024 * 1024)
