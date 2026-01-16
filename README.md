@@ -46,6 +46,78 @@ graph TD
 | `fredprime_litigation_system.json` | Main system manifest/configuration             | MCR 2.401                    |
 | `audit_chain.log`                  | Immutable audit log/chain-of-custody           | MCR 2.401, MCL 600.2140      |
 | `modules/benchbook_loader.py`      | Extract text from Michigan benchbook PDFs      | MCR 2.401                    |
+| `convergence_cycle_engine.py`      | Iterative build system with version control    | Litigation-grade deployment  |
+
+---
+
+## 🔄 **Advanced Convergence Cycle System**
+
+The **Convergence Cycle Engine** provides litigation-grade iterative builds with full traceability:
+
+### **Output Contract (Every Cycle)**
+
+1. **Increment VERSION** (v0001 → v0002 → v0003...)
+2. **Update CURRENT** (always points to runnable latest version)
+3. **Snapshot VERSIONS/vNNNN** (immutable archive of each version)
+4. **Update CHANGELOG + MANIFEST** (complete change tracking)
+5. **Run smoke tests** and capture logs
+6. **Build FULL release zip** (if >2 files change or multi-module feature added)
+7. **Enforce size policy**:
+   - Exclude large binaries/weights/media
+   - Use PATCHES mode if projected >650MB
+   - Report size budget when growth >50MB
+
+### **Running the Convergence Cycle**
+
+```bash
+# Run full convergence cycle
+python convergence_cycle_engine.py
+
+# Or use the CLI wrapper
+python run_cycle.py
+
+# Check current status
+python run_cycle.py --status
+
+# View version history
+python run_cycle.py --history
+
+# Create snapshot without full cycle
+python run_cycle.py --snapshot
+```
+
+### **Version Management**
+
+- **VERSION**: Current version number (e.g., `v0042`)
+- **CURRENT**: Pointer to latest runnable version
+- **VERSIONS/vNNNN/**: Immutable snapshots of each build
+  - Complete source code snapshot
+  - `SNAPSHOT_MANIFEST.json` with file listing and metadata
+  
+### **Build Artifacts**
+
+- **CHANGELOG.md**: Complete change history in Keep a Changelog format
+- **codex_manifest.json**: SHA-256 hashes of all modules
+- **logs/convergence_cycle.log**: Full cycle execution log
+- **logs/smoke_tests.log**: Test results with timestamps
+- **logs/size_report.log**: Size policy compliance reports
+- **output/SUPREME_LITIGATION_OS_vNNNN_TIMESTAMP.zip**: Full release packages
+
+### **Size Policy Enforcement**
+
+The system automatically:
+- Excludes large files (>10MB) from releases
+- Switches to PATCHES mode for projects >650MB
+- Reports size growth warnings when changes >50MB
+- Maintains size budget history
+
+### **Smoke Tests**
+
+Each cycle runs:
+1. Core module import tests
+2. Manifest integrity verification
+3. Critical file existence checks
+4. Full pytest suite (if available)
 
 ---
 
