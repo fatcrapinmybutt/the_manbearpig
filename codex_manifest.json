@@ -64,6 +64,14 @@
     "dependencies": []
   },
   {
+    "module": "run_cycle",
+    "path": "run_cycle.py",
+    "hash": "326a8105c933c8f9029cc22a084d4d66cfe05de4e4198c49ee9532a910955065",
+    "sha256": "326a8105c933c8f9029cc22a084d4d66cfe05de4e4198c49ee9532a910955065",
+    "legal_function": "CLI wrapper for Convergence Cycle Engine",
+    "dependencies": []
+  },
+  {
     "module": "litigation_os_generate_motion (1)",
     "path": "litigation_os_generate_motion (1).py",
     "hash": "484481b86921ccaa68052be7a29349b0d81b0b6f00138a6049755150fb06fc51",
