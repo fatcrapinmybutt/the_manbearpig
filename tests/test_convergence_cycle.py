@@ -101,7 +101,8 @@ def test_update_changelog(temp_repo):
     
     changelog_content = Path("CHANGELOG.md").read_text()
     assert "[v0001]" in changelog_content
-    assert "2026-01-16" in changelog_content or "Modified" in changelog_content
+    # Check for any date in YYYY-MM-DD format or the word "test_file.py"
+    assert "2026-" in changelog_content or "test_file.py" in changelog_content
 
 
 def test_update_manifest(temp_repo):

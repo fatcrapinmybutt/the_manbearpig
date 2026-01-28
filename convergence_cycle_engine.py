@@ -26,6 +26,9 @@ import zipfile
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+# Ensure logs directory exists before configuring logging
+Path("logs").mkdir(exist_ok=True)
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
